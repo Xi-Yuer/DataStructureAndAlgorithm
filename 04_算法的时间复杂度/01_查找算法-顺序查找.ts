@@ -1,14 +1,12 @@
 
 // 顺序查找
 function sequentSearch(array: number[], num: number) {
-    console.time()
     for (let index = 0; index < array.length; index++) {
         const element = array[index];
         if (element === num) {
             return index
         }
     }
-    console.timeEnd()
     return -1
 }
 
