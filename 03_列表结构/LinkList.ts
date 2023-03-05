@@ -1,5 +1,5 @@
 // 创建一个节点类
-class _Node<T> {
+export class _Node<T> {
     value: T   // 当前节点的值
     next: _Node<T> | null = null // 当前节点的下一个节点的指针
     constructor(value: T) {
@@ -7,7 +7,7 @@ class _Node<T> {
     }
 }
 
-class LinkList<T> {
+export class LinkList<T> {
     private head: _Node<T> | null = null // 头节点
     private size: number = 0
 
