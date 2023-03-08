@@ -9,6 +9,14 @@ class TreeNode<T> {
     left: TreeNode<T> | null = null
     // 右子节点
     right: TreeNode<T> | null = null
+    // 当前节点的父节点
+    parent: TreeNode<T> | null = null
+    get isLeft(): boolean {
+        return !!(this.parent && this.parent.left === this)
+    }
+    get isRight(): boolean {
+        return !!(this.parent && this.parent.right === this)
+    }
     constructor(value: T) {
         this.value = value
     }
@@ -152,20 +160,135 @@ class BSTree<T> {
 
     // 搜索
     search(value: T): boolean {
-        let current = this.root
-        if (!current) return false
-        while (current) {
-            // 判断当前节点是否是我们需要的节点
-            if (current?.value === value) return true
-            // 如果不是(比较当前的值比当前的 curretn 大还是小，从而决定去左子树还是右子树中去搜索)
-            current.value > value ? (current = current.left) : (current = current.right)
-        }
+        return !!this.searchNode(value)
+    }
 
-        return false
+    // 搜索树节点
+    private searchNode(value: T): TreeNode<T> | null {
+        // 搜索当前树中是否有这个值
+        let current = this.root // 当前节点
+        let parent: TreeNode<T> | null = null  // 当前节点的父节点（父节点为空时，则该节点为根节点）
+        while (current) {
+            // 找到了退出循环
+            if (current?.value === value) {
+                current.parent = parent
+                return current
+            }
+            // 为父节点赋值
+            parent = current
+            // 当前值小于当前节点就去左子节点去找
+            if (current?.value > value) {
+                current = current?.left
+            } else {
+                // 当前值大于当前节点就去右子节点去找
+                current = current?.right
+            }
+        }
+        // 循环完毕也没有找到
+        return null
     }
 
     // 删除
+    remove(value: T): boolean {
+        // 当前节点
+        const current = this.searchNode(value)
 
+        // 没有找到
+        if (!current) return false
+
+        // 1:删除叶子节点
+        if (!current.left && !current.right) {
+            // 如果当前节点为根节点且没有子节点（直接删除）
+            if (current === this.root) {
+                this.root === null
+                return true
+            }
+            // 当前节点属于父节点的左子节点还是右子节点
+            if (current.isLeft) {
+                current.parent!.left = null
+                return true
+            } else {
+                current.parent!.right = null
+                return true
+            }
+        }
+
+        // 2：删除节点存在一个左子节点
+        if (current.left && !current.right) {
+            // 当前节点是根节点
+            if (current === this.root) {
+                this.root = current.left
+                return true
+            } else {
+                // 当前节点不是根节点
+                current.parent!.right = current.left
+                return true
+            }
+        }
+
+        // 3：删除节点存在一个右子节点
+        if (current.right && !current.left) {
+            // 当前节点是根节点
+            if (current === this.root) {
+                this.root = current.right
+                return true
+            } else {
+                // 当前节点不是根节点
+                current.parent!.right = current.right
+                return true
+            }
+        }
+
+        // 4：删除节点存在两个子节点
+        if (current.right && current.left) {
+            // 前驱结点（当前节点的左子树中最大的节点）
+            // 后继节点（当前节点的右子树中最小的节点）
+            const successor = this.getSuccessor(current) // 获取到的后继节点
+            // 当前节点是否是根节点
+            if (current === this.root) {
+                this.root = successor
+                return true
+            }
+            // 当前的节点是左节点
+            if (current.isLeft) {
+                current.parent!.left = successor
+                return true
+            }
+            if (current.isRight) {
+                current.parent!.right = successor
+                return true
+            }
+        }
+        return false
+    }
+
+    // 获取当前删除节点的后继节点
+    private getSuccessor(delNode: TreeNode<T>): TreeNode<T> {
+        // 获取删除节点的右子树
+        let current = delNode.right
+        // 后继节点(右子节点中最小的值)
+        let successor: TreeNode<T> | null = null
+        // 寻找右子节点中最小的值
+        while (current) {
+            successor = current
+            current = current.left
+            if (current) {
+                current.parent = successor
+            }
+        }
+        // 循环结束，找到了右子树最小值 ==>
+
+        // 当找到的后继节点不等于删除节点的右子节点时
+        if (successor !== delNode.right) {
+            // 后继节点提到删除节点时，需要将后继节点的右子节点提到后继节点的父节点的左子节点中去
+            successor!.parent!.left = successor?.right ?? null
+            // 赋值右子树的值
+            successor!.right = delNode.right
+        }
+        // 将删除节点的左子节点赋值给后继节点的左子节点
+        successor!.left = delNode.left
+        return successor!
+    }
 }
 
 const bst = new BSTree<number>()
@@ -201,4 +324,9 @@ bst.insert(6)
 // console.log(bst.getMax()) // 25
 // console.log(bst.getMin()) // 3
 
-console.log(bst.search(25))
+// bst.print()
+// console.log(bst.search(30))
+
+bst.print()
+bst.remove(11)
+bst.print()
