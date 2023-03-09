@@ -333,7 +333,7 @@ class HashTable<T = any> {
 ```
 
 ## 树
-```typescript
+``` typescript
     // 打印树结构
 import { btPrint } from 'hy-algokit'
 
