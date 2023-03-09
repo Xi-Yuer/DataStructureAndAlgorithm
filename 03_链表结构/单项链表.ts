@@ -50,13 +50,21 @@ export class LinkList<T> {
         let current = this.head
         while (current) {
             values.push(current.value)
-            current = current.next
+            if (this.isTail(current)) {// 最后一个节点
+                current = null
+            } else {
+                current = current.next// 不是最后一个节点
+            }
+        }
+        // 当是循环列表时
+        if (this.head && this.tail?.next === this.head) {
+            values.push(this.head.value)
         }
         console.log(values.join('-'))
     }
 
     // 向链表任意位置添加元素
-    insert(el: T, position: number) {
+    insert(el: T, position: number): boolean {
         // 边界判断
         if (position < 0 || position > this.size) return false // 插入越界直接返回 false
         // 根据 el 创建新的节点
@@ -66,6 +74,7 @@ export class LinkList<T> {
             let current = this.head
             this.head = newNode
             newNode.next = current
+            return true
         } else {
             let current = this.head // 当前节点
             let currentPre: _Node<T> | null = null // 当前节点的上一个节点
@@ -83,6 +92,7 @@ export class LinkList<T> {
             }
         }
         this.size++
+        return true
     }
 
     // 删除链表指定索引元素
@@ -154,7 +164,11 @@ export class LinkList<T> {
             if (current.value === value) {
                 return index
             }
-            current = current.next
+            if (this.isTail(current)) { // 当当前节点是最后一个节点时终止循环
+                current = null
+            } else {
+                current = current.next
+            }
             index++
         }
         return -1
