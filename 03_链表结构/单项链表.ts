@@ -8,12 +8,19 @@ export class _Node<T> {
 }
 
 export class LinkList<T> {
-    private head: _Node<T> | null = null // 头节点
-    private size: number = 0
+    protected head: _Node<T> | null = null // 头节点
+    protected size: number = 0
+    // 链表的尾部
+    protected tail: _Node<T> | null = null
 
     // 获取链表的长度
     get length() {
         return this.size
+    }
+
+    // 判断当前节点是否是最后一个节点
+    private isTail(node: _Node<T>) {
+        return node === this.tail
     }
 
     // 向链表尾部添加元素
@@ -25,14 +32,15 @@ export class LinkList<T> {
             this.head = newNode
         } else {
             // 链表不为空时
-            let current = this.head // 找到头节点
-            while (current.next) {
-                current = current.next // 只要当前节点的 next 有值，就继续循环
-            }
-            // 跳出循环时，说明当前的 current 已指向最后一个节点
-            current.next = newNode  // 将最后一个节点的 next 指向新节点
+            // let current = this.head // 找到头节点
+            // while (current.next) {
+            //     current = current.next // 只要当前节点的 next 有值，就继续循环
+            // }
+            // // 跳出循环时，说明当前的 current 已指向最后一个节点
+            // current.next = newNode  // 将最后一个节点的 next 指向新节点
+            this.tail!.next = newNode
         }
-
+        this.tail = newNode
         this.size++ // 链表长度累加
     }
 
@@ -68,6 +76,11 @@ export class LinkList<T> {
             }
             newNode.next = current
             currentPre!.next = newNode
+
+            // 当插入的元素刚好是查到尾部，就需要修改 tail
+            if (position === this.length) {
+                this.tail = newNode
+            }
         }
         this.size++
     }
@@ -82,6 +95,10 @@ export class LinkList<T> {
         if (position === 0) {
             this.head = this.head?.next ?? null
             delValue = this.head?.value ?? null
+            // 当删除时链表只有一个节点，需要改变 tail 的指向
+            if (this.length === 1) {
+                this.tail = null
+            }
         } else {
             let current = this.head
             let currentPre: _Node<T> | null = null
@@ -93,6 +110,11 @@ export class LinkList<T> {
             // 找到了需要的节点
             currentPre!.next = current?.next ?? null
             delValue = current?.value ?? null
+
+            // 删除的节点刚好是最后一个
+            if (position === this.length - 1) {
+                this.tail = currentPre
+            }
         }
 
         this.size--
