@@ -1,4 +1,4 @@
-import { swap } from "hy-algokit"
+import { swap, measureSort } from "hy-algokit"
 import { testSort } from "../00_utils/idnex"
 
 function MyBubbleSort(arr: number[]): number[] {
@@ -30,5 +30,5 @@ function BubbleSort(arr: number[]): number[] {
     return arr
 }
 
-testSort(MyBubbleSort)
-testSort(BubbleSort)
+measureSort(MyBubbleSort,10000) // 使用 MyBubbleSort 算法 排序 10000 个元素 消耗时间为 232.23 毫秒.
+measureSort(BubbleSort,10000)   // 使用 BubbleSort 算法 排序 10000 个元素 消耗时间为 285.78 毫秒.
